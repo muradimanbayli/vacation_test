@@ -12,3 +12,4 @@ Vacation Management Insatll
   $ 0.0.0.0   localhost
 6.Open Chrome browser and enter the link below:
   $ localhost:5000/
+# vacation_test
