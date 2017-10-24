@@ -7,7 +7,7 @@ Vacation Management Insatll
   ```
 2.Go to the home directory of vacation management project from terminal
 ```
-  $ cd /fakepath/invenshure
+  $ cd /fakepath/vacation_test
 ```  
 3.For starting docker compose run the following command
 ```
