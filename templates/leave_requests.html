@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- Bootstrap Library-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  	<!-- Jquerey UI library-->
+  	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  	<link rel="stylesheet" href="/resources/demos/style.css">
+  	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<body>
+	{% if session['active']==0 %}
+	<div class="panel panel-default">
+  		<div class="panel-body">Welcome {{session['name']}} , You dont have any access please wait administrator approve</div>
+	</div>
+{% endif %}
+
+
+{% if session['active']==1 and session['user_group']=='administrator' %}
+{% include 'nav.html' %}
+
+<div class="panel panel-default">
+	<div class="panel-body">
+
+	  {% with messages = get_flashed_messages() %}
+         {% if messages %}
+               {% for message in messages %}
+              	 <div class="alert alert-success">
+  	 				<strong>Info !</strong> {{ message }}
+   				</div>
+               {% endfor %}
+         {% endif %}
+      {% endwith %}	
+		
+    <a href="?status=pending" class="btn btn-default">Pending</a>
+	<a href="?status=all" class="btn btn-default">All Request</a>
+
+	<br/>
+	<br/>
+
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>Full Name</th>
+				<th>Begin Date</th>
+				<th>End Date</th>
+				<th>Category</th>
+				<th>Status</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in requests %}
+			 <tr>
+				<td>{{row[0]}}</td>
+				<td>{{row[1]}}</td>
+				<td>{{row[2]}}</td>
+				<td>{{row[3]}}</td>
+				<td>{{row[5]}}</td>
+				<td>
+					<a href="requests?action=accepted&id={{row[4]}}">Accept</a> | 
+					<a href="requests?action=declined&id={{row[4]}}">Decline</a>
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+</div>
+</div>
+{% endif %}
+</body>
+</html>

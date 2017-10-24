@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- Bootstrap Library-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  	<!-- Jquerey UI library-->
+  	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  	<link rel="stylesheet" href="/resources/demos/style.css">
+  	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<body>
+	{% if session['active']==0 %}
+	<div class="panel panel-default">
+  		<div class="panel-body">Welcome {{session['name']}} , You dont have any access please wait administrator approve</div>
+	</div>
+{% endif %}
+
+
+{% if session['active']==1  and session['user_group']=='administrator' %}
+{% include 'nav.html' %}
+
+<div class="panel panel-default">
+	<div class="panel-body">
+
+	  {% with messages = get_flashed_messages() %}
+         {% if messages %}
+               {% for message in messages %}
+              	 <div class="alert alert-success">
+  	 				<strong>Info !</strong> {{ message }}
+   				</div>
+               {% endfor %}
+         {% endif %}
+      {% endwith %}	
+		
+
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>Email</th>
+				<th>Active Status</th>
+				<th>User Group</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in users %}
+			 <tr>
+				<td>{{row[0]}}</td>
+				<td>
+					{% if row[1] == 0 %}
+						lock
+					{% endif %}
+					{% if row[1] == 1 %}
+						active
+					{% endif %}
+				</td>
+				<td>
+					<select name="user_group" onchange="window.location='?action=change&user_group='+this.value+'&email={{row[0]}}'">
+						<option {% if row[2]=='viewer' %} selected {% endif %} value="viewer">Viewer</option>
+						<option {% if row[2]=='employee' %} selected {% endif %} value="employee">Employee</option>
+						<option {% if row[2]=='administrator' %} selected {% endif %} value="administrator">Administrator</option>
+					</select>
+				</td>
+				<td>
+					<a href="users?action=activate&email={{row[0]}}">activate</a> | 
+					<a href="users?action=lock&email={{row[0]}}">lock</a>
+				</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+</div>
+</div>
+{% endif %}
+</body>
+</html>

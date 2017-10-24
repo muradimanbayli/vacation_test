@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Login Page</title>
+	<meta name="google-signin-client_id" content="588969886721-n1olltnrhg2vv842dbvin35ejients4a.apps.googleusercontent.com">
+</head>
+<body>
+	 <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
+	 <script src="https://apis.google.com/js/platform.js" async defer></script>
+        <script>
+            function onSignIn(googleUser) {
+            	window.location = "user/"+googleUser.Zi.access_token;
+            }
+        </script>
+</body>
+</html>

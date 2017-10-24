@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- Bootstrap Library-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  	<!-- Jquerey UI library-->
+  	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<body>
+{% if session['active']==0 %}
+	<div class="panel panel-default">
+  		<div class="panel-body">Welcome {{session['name']}} , You dont have any access please wait administrator approve</div>
+	</div>
+{% endif %}
+
+
+{% if session['active']==1 %}
+{% include 'nav.html' %}
+
+<div class="panel panel-default">
+	<div class="panel-body">
+
+	  {% with messages = get_flashed_messages() %}
+         {% if messages %}
+               {% for message in messages %}
+              	 <div class="alert alert-success">
+  	 				<strong>Success!</strong> {{ message }}
+   				</div>
+               {% endfor %}
+         {% endif %}
+      {% endwith %}	
+	
+	{% if session['user_group']=='employee' or session['user_group']=='administrator' %}	
+	<fieldset>
+		<legend>Leave Request</legend>
+		<form action="calendar?action=add" method="POST" onsubmit="return checkInput();">
+			<select name="category" class="selectpicker">
+				{% for row in categories %}
+					<option value="{{row[1]}}">{{row[1]}}</option>
+				{% endfor %}
+			</select>
+			<input type="text" id="begin" name="begin" class="datepicker inputstyle" placeholder="begin date">
+			<input type="text" id="end" name="end" class="datepicker inputstyle" placeholder=" end date"> 
+			<input type="submit" name="submit" value="New leave request" class="btn btn-default">
+		</form>
+	</fieldset>
+	<hr/>
+
+	{% endif %}
+
+	{% if session['user_group']=='viewer' or session['user_group']=='employee' or session['user_group']=='administrator' %}
+	<br/>
+	<button onclick="previousMonth()" class="btn btn-default"> < Previous Month</button>
+	<button onclick="nextMonth()" class="btn btn-default">Next Month > </button>
+	<br/>
+	<br/>
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>Monday</th>
+				<th>Tuesday</th>
+				<th>Wednesday</th>
+				<th>Thursday</th>
+				<th>Friday</th>
+				<th>Saturday</th>
+				<th>Sunday</th>	
+			</tr>
+		</thead>
+		<tbody id="calendar">
+			
+		</tbody>
+	</table>
+
+	{% endif %}
+
+</div>
+</div>	
+	<script type="text/javascript">
+		var currentDate = new Date();
+
+		function checkInput(){
+			var beginDate=document.getElementById("begin");
+			var endDate =document.getElementById("end");
+
+			if(beginDate.value==''){
+				alert('Begin date is required');
+				return false;
+			}
+
+			if(endDate.value==''){
+				alert('End date is required');
+				return false;
+			}
+			return true;
+		}
+
+		function previousMonth(){
+			currentDate.setMonth(currentDate.getMonth()-1);
+			var calendarBeginDate = findFirstDayOfWeek(findFirstDayOfMonth(currentDate));
+			var response = JSON.parse(sendRequest('get_vacation_days/'+defaultFormat(calendarBeginDate)));
+			generateCalendar(currentDate,response);
+		}
+
+		function nextMonth(){
+			currentDate.setMonth(currentDate.getMonth()+1);
+			var calendarBeginDate = findFirstDayOfWeek(findFirstDayOfMonth(currentDate));
+			var response = JSON.parse(sendRequest('get_vacation_days/'+defaultFormat(calendarBeginDate)));
+			generateCalendar(currentDate,response);
+		}
+
+		function addDays(date, days) {
+  			var result = new Date(date);
+  			result.setDate(result.getDate() + days);
+  			return result;
+		}
+
+		function findFirstDayOfMonth(pdate){
+			var date = new Date(pdate);
+			var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+			return firstDay;
+		}
+
+		function findFirstDayOfWeek(pdate){
+			var d = new Date(pdate);
+ 		    var day = d.getDay(),
+      		diff = d.getDate() - day + (day == 0 ? -6:1);
+  			return new Date(d.setDate(diff));
+		}
+
+
+		function generateCalendar(pdate,response){
+			var tableCalendarBody=document.getElementById("calendar");
+			var calendarDay = findFirstDayOfWeek(findFirstDayOfMonth(pdate));
+			
+			var tableContent = "";
+			for (var i = 0; i < 6; i++) {
+				tableContent=tableContent+"<tr>";
+				for (var j = 0; j < 7; j++) {
+					var tempCalendarDay = defaultFormat(calendarDay) ; 
+					tableContent=tableContent+"<td>"+ tempCalendarDay + " <br>"+ concatEmployeeNames(response[tempCalendarDay]) +"</td>";	
+					calendarDay=addDays(calendarDay,1);	
+				}
+				tableContent=tableContent+"</tr>";	
+			}
+			tableCalendarBody.innerHTML=tableContent;
+		}
+
+		function defaultFormat(pdate){
+			var date = new Date(pdate);
+			var dd = date.getDate();
+			var mm = date.getMonth()+1;
+
+			var yyyy = date.getFullYear();
+			if(dd<10){
+    			dd='0'+dd;
+			} 
+			if(mm<10){
+			    mm='0'+mm;
+			} 
+			var formatteddate = dd+'-'+mm+'-'+yyyy;
+			return formatteddate;
+		}
+
+		function concatEmployeeNames(employees){
+			var names = "";
+			if(employees.length == 0){
+				return "";
+			}
+			for (var i = 0; i < employees.length ; i++) {
+			    names += employees[i]["name"]+"<br/>";
+			}
+			return names;
+		}
+
+		function sendRequest(url) {
+  			var xhttp = new XMLHttpRequest();
+  			var response = "";
+  			xhttp.onreadystatechange = function() {
+    			if (this.readyState == 4 && this.status == 200) {
+      				response = this.responseText;
+    			}
+  			};
+  			xhttp.open("GET", url, false);
+  			xhttp.send();
+  			return response;
+		}	
+
+
+		var calendarBeginDate = findFirstDayOfWeek(findFirstDayOfMonth(currentDate));
+		var response = JSON.parse(sendRequest('get_vacation_days/'+defaultFormat(calendarBeginDate)));
+		generateCalendar(currentDate,response);
+
+
+		var deinedDays = JSON.parse(sendRequest('get_denied_days'))
+		$( function() {
+    		$( ".datepicker" ).datepicker(
+    			{ 
+    				dateFormat: 'dd-mm-yy',
+    				beforeShowDay: function(date){
+     			    	var string = jQuery.datepicker.formatDate('yy-mm-dd', date);
+        				return [ deinedDays.indexOf(string) == -1 ]
+    				}
+    			}
+    			);
+  		} );
+
+	</script>
+	<style type="text/css">
+		.inputstyle{
+	    	height: 34px;
+    		padding: 6px 12px;
+    		font-size: 14px;
+    		line-height: 1.42857143;
+    		color: #555;
+    		background-color: #fff;
+    		background-image: none;
+    		border: 1px solid #ccc;
+    		border-radius: 4px;
+    		-webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    		box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    		-webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    		-o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    		transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+		}
+	</style>>	
+{% endif %}
+</body>
+</html>

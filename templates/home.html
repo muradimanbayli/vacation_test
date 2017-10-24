@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Welcome page</title>
+	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+{% if session['active']==0 %}
+	<div class="panel panel-default">
+  		<div class="panel-body">Welcome {{session['name']}} , You dont have any access please wait administrator approve</div>
+	</div>
+{% endif %}
+
+
+{% if session['active']==1 %}
+{% include 'nav.html' %}
+
+<div class="panel panel-default">
+	<div class="panel-body">
+		Welcome {{session['name']}}
+	</div>
+</div>
+{% endif %}
+
+
+</body>
+</html>

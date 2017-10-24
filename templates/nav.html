@@ -1,0 +1,25 @@
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <ul class="nav navbar-nav">
+      {% if session['user_group']=='employee' or session['user_group']=='administrator' or session['user_group']=='viewer'%}
+      <li><a href="/calendar">Calendar</a></li>
+      {% endif %}
+
+      {% if session['user_group']=='administrator' %}
+      <li><a href="/categories">Leave Categories</a></li>
+      {% endif %}
+
+      {% if session['user_group']=='administrator' %}
+      <li><a href="/users">Users</a></li>
+      {% endif %}
+
+      {% if session['user_group']=='administrator' %}
+      <li><a href="/requests?status=pending">Requests</a></li>
+      {% endif %}
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="/profile"><span class="glyphicon glyphicon-user"></span> {{session['name']}}</a></li>
+      <li><a href="https://accounts.google.com/Logout?"><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+    </ul>
+  </div>
+</nav>

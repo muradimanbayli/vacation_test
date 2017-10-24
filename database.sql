@@ -1,0 +1,12 @@
+create DATABASE IF NOT EXISTS vacation;
+create TABLE IF NOT EXISTS vacation.categories ( id int NOT NULL AUTO_INCREMENT,category varchar(255) NOT NULL,PRIMARY KEY (ID));
+insert into vacation.categories (category) SELECT * FROM ( SELECT 'Annual Leave' ) AS tmp WHERE NOT EXISTS ( SELECT category FROM vacation.categories WHERE category = 'Annual Leave') LIMIT 1;
+insert into vacation.categories (category) SELECT * FROM ( SELECT 'Personal/Carer Leave' ) AS tmp WHERE NOT EXISTS ( SELECT category FROM vacation.categories WHERE category = 'Personal/Carer Leave') LIMIT 1;
+insert into vacation.categories (category) SELECT * FROM ( SELECT 'Long Service Leave' ) AS tmp WHERE NOT EXISTS ( SELECT category FROM vacation.categories WHERE category = 'Long Service Leave') LIMIT 1 ;
+insert into vacation.categories (category) SELECT * FROM ( SELECT 'Time in Lieu' ) AS tmp WHERE NOT EXISTS ( SELECT category FROM vacation.categories WHERE category = 'Time in Lieu') LIMIT 1  ;
+insert into vacation.categories (category) SELECT * FROM ( SELECT 'Long Service Leave' ) AS tmp WHERE NOT EXISTS ( SELECT category FROM vacation.categories WHERE category = 'Long Service Leave') LIMIT 1 ;
+create table IF NOT EXISTS vacation.users ( email VARCHAR(200) not null, active int not null, check (active in (0,1)),user_group VARCHAR(200), check (user_group in ('viewer','employee','administrator')), primary key (email)) ;
+create table IF NOT EXISTS vacation.denied_days( date_ date not null unique ) ;
+create table IF NOT EXISTS vacation.requests( email varchar(200) not null, begin_date date not null,end_date date not null,status varchar(200) not null,full_name varchar(200) not null,leave_category varchar(200) not null,id int not null AUTO_INCREMENT,check (status in ('pending','accepted','declined')), primary key (id));
+insert into vacation.users(email,active,user_group) values ('muradimanbayli@gmail.com',1,'administrator');
+insert INTO vacation.denied_days (date_) VALUES ('2017-10-21');
