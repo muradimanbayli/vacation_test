@@ -3,7 +3,7 @@ Vacation Management Insatll
 
 1.Clone Github repository
   ```
-  $ git clone https://github.com/muradimanbayli/invenshure.git
+  $ git clone https://github.com/muradimanbayli/vacation_test.git
   ```
 2.Go to the home directory of vacation management project from terminal
 ```
